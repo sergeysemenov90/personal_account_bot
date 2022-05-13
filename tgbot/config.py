@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-
+from typing import List
 from environs import Env
 
 
 @dataclass
 class DbConfig:
     host: str
+    port: int
     password: str
     user: str
     database: str
@@ -14,7 +15,7 @@ class DbConfig:
 @dataclass
 class TgBot:
     token: str
-    admin_ids: list[int]
+    admin_ids: List[int]
     use_redis: bool
 
 
@@ -42,6 +43,7 @@ def load_config(path: str = None):
         ),
         db=DbConfig(
             host=env.str('DB_HOST'),
+            port=env.int('DB_PORT', 5432),
             password=env.str('DB_PASS'),
             user=env.str('DB_USER'),
             database=env.str('DB_NAME')
