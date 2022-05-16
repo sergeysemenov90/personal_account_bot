@@ -8,6 +8,7 @@ from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
+from tgbot.handlers.side_service import register_side_service
 from tgbot.middlewares.db import DbMiddleware, SavedInDbMiddleware
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 
@@ -27,6 +28,7 @@ def register_all_filters(dp):
 def register_all_handlers(dp):
     register_admin(dp)
     register_user(dp)
+    register_side_service(dp)
 
 
 async def main():

@@ -4,6 +4,6 @@ share_kb = KeyboardButton('Поделиться контактом', request_con
 contact_request_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(share_kb)
 
 
-get_kp = KeyboardButton('получить кп')
-get_deals = KeyboardButton('получить сделки')
+get_kp = KeyboardButton('/get_kp')
+get_deals = KeyboardButton('/get_deals')
 all_func_kb = ReplyKeyboardMarkup().row(get_kp, get_deals)
