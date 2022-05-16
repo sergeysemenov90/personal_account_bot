@@ -5,9 +5,12 @@ from aiogram.types import Message, ChatActions, ReplyKeyboardRemove
 
 from tgbot.database.user_repository import UserRepository
 from tgbot.keyboards import reply, inline
+from tgbot.middlewares.db import check_user
+from tgbot.middlewares.throttling import rate_limit
 from tgbot.models.user import User
 
 
+@rate_limit(5)
 async def user_start(message: Message):
     await message.bot.send_chat_action(message.chat.id, ChatActions.TYPING)
     await message.answer("Привет! Это бот-помощник Allio\nОн может предоставить тебе данные твоего личного кабинета"
@@ -27,10 +30,11 @@ async def user_contact_save(message: Message):
     await repo.create(user)
 
 
-async def user_get(message: Message):
-    user: User = await UserRepository().get(message.from_user.id)
+@rate_limit(5)
+@check_user()
+async def user_get(message: Message, user: User):
     if user:
-        await message.answer(f'Вы - {user.first_name} {user.last_name}')
+        await message.answer(f'Вы - {user.first_name} {user.last_name}', reply_markup=reply.all_func_kb)
     else:
         await message.answer('Вы не сохранены в БД')
 

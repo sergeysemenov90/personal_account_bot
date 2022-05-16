@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import Session, sessionmaker
-from aiomysql.sa import create_engine
+from sqlalchemy.orm import sessionmaker
 from tgbot.config import load_config
 from tgbot.database.models.user import Base
 
@@ -13,14 +12,17 @@ class Database:
         self.engine = None
 
     async def make_engine(self):
-        engine = create_async_engine('mysql+aiomysql://root:7PF6wihk@localhost:3306/personal_account_bot')
-        # TODO: use params
+        db_config = self.config.db
+        engine = create_async_engine(f'mysql+aiomysql://{db_config.user}:'
+                                     f'{db_config.password}@'
+                                     f'{db_config.host}:'
+                                     f'{db_config.port}/'
+                                     f'{db_config.database}')
         return engine
 
     async def base_metadata_save(self):
         engine = await self.make_engine()
         async with engine.begin() as conn:
-            # await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
         async_session = sessionmaker(

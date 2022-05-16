@@ -8,13 +8,16 @@ from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
 from tgbot.handlers.user import register_user
-from tgbot.middlewares.db import DbMiddleware
+from tgbot.middlewares.db import DbMiddleware, SavedInDbMiddleware
+from tgbot.middlewares.throttling import ThrottlingMiddleware
 
 logger = logging.getLogger(__name__)
 
 
 def register_all_middlewares(dp):
     dp.setup_middleware(DbMiddleware())
+    dp.setup_middleware(ThrottlingMiddleware())
+    dp.setup_middleware(SavedInDbMiddleware())
 
 
 def register_all_filters(dp):
@@ -59,13 +62,17 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")
 
-# TODO: Написать мидлвэйр - защиту от тротлинга (антиспам)
-# TODO: Написать мидлвэйр (либо фильтр) на проверку автора запроса в базе данных
-# TODO: Определить необходимые для тестирования места, написать тесты
+
+# TODO: Переписать class Database (DRY, выделить engine в init)
+
+
+# TODO: Написать/утвердить роут пользователя
 # TODO: Получить список данных для получения для MVP
 # TODO: Настроить отправку запросов и получение данных к серверам Allio
-# TODO: Рассмотреть необходимость кэширования
-# TODO: Написать/утвердить роут пользователя
-# TODO: Запросить создание репозитория для проекта
 # TODO: Разобраться в ansible скриптах
-# TODO: Переписать class Database (DRY, выделить engine в init)
+
+
+
+# TODO: Определить необходимые для тестирования места, написать тесты
+# TODO: Рассмотреть необходимость кэширования
+# TODO: Запросить создание репозитория для проекта
