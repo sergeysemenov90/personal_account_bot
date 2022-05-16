@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-import aiomysql
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
@@ -27,23 +26,6 @@ def register_all_handlers(dp):
     register_user(dp)
 
 
-async def start_db(config):
-    conn: aiomysql.Connection = await aiomysql.connect(
-        host=config.db.host,
-        port=config.db.port,
-        user=config.db.user,
-        password=config.db.password,
-        db=config.db.database
-    )
-    create_table_command = open('tgbot/services/create_table.sql', 'r').read()
-    async with conn.cursor() as curs:
-        try:
-            await curs.execute(create_table_command)
-            logger.info('Таблица создана!')
-        except Exception as e:
-            logger.info(f'Таблица не создана! \nОшибка {e}')
-
-
 async def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -55,7 +37,6 @@ async def main():
     storage = MemoryStorage()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher(bot, storage=storage)
-    db_conn = await start_db(config)
 
     bot['config'] = config
 
@@ -77,3 +58,14 @@ if __name__ == '__main__':
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logger.error("Bot stopped!")
+
+# TODO: Написать мидлвэйр - защиту от тротлинга (антиспам)
+# TODO: Написать мидлвэйр (либо фильтр) на проверку автора запроса в базе данных
+# TODO: Определить необходимые для тестирования места, написать тесты
+# TODO: Получить список данных для получения для MVP
+# TODO: Настроить отправку запросов и получение данных к серверам Allio
+# TODO: Рассмотреть необходимость кэширования
+# TODO: Написать/утвердить роут пользователя
+# TODO: Запросить создание репозитория для проекта
+# TODO: Разобраться в ansible скриптах
+# TODO: Переписать class Database (DRY, выделить engine в init)

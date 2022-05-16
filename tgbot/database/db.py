@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 from aiomysql.sa import create_engine
@@ -12,14 +13,14 @@ class Database:
         self.engine = None
 
     async def make_engine(self):
-        engine = create_async_engine('mysql+aiomysql://root:7PF6wihk@localhost:3306/personal_account_bot')  # TODO:
-        # use params
+        engine = create_async_engine('mysql+aiomysql://root:7PF6wihk@localhost:3306/personal_account_bot')
+        # TODO: use params
         return engine
 
     async def base_metadata_save(self):
         engine = await self.make_engine()
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+            # await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
         async_session = sessionmaker(
@@ -35,5 +36,13 @@ class Database:
                 session.add(obj_to_create)
                 await session.commit()
                 return obj_to_create
+
+    async def get(self, model, id):
+        async_session = await self.base_metadata_save()
+        async with async_session() as session:
+            async with session.begin():
+                result = await session.execute(select(model).where(model.user_id == id))
+                user = result.scalars().first()
+                return user
 
 
